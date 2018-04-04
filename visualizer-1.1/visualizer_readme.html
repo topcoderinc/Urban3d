@@ -1,0 +1,89 @@
+<h1>Building Detector 3D Challenge tools</h1>
+
+The purpose of this application is to let you view building footprint masks overlaid on satellite images, compare truth to solution annotations, and calculate your solution's score. It can also convert footprint instance label files between TIFF and TXT formats.<br/>
+
+<h2>Visualizer and scorer tool</h2>
+Download the <a href="http://www.topcoder.com/contest/problem/UrbanMapper3D/visualizer-1.0.zip">visualizer package</a> and unpack it anywhere on your system. Open a command window in the directory where you unzipped the package and execute
+<pre>
+java -Xmx2g -jar visualizer.jar 
+     -data-dir &lt;data_directory&gt; 
+     -truth &lt;truth_file&gt;
+     -solution &lt;solution_file&gt; 
+</pre>
+<i>(The above is a single line command, line breaks are only for readability. The -Xmx2g parameter gives 2GB RAM available for Java. If you have more RAM and you work with lots of data then it is recommended to set this value higher.)</i><br/><br/>
+
+This assumes that you have Java (at least v1.7) installed and it is available on your path. The meaning of the above parameters are the following:
+<ul>
+	<li>-data-dir : specifies the base directory of the data files, i.e. the satellite images (RGB and DSM files). This parameter is required.</li>
+	<li>-truth : the ground truth building footprint instance definition file in TXT format, see truth-example.txt for an example (available from the problem statement). This parameter is optional. See the <i>File converter tool</i> section for information on how to generate this file from TIFF files.</li>
+	<li>-solution : your solution file, see solution-example.txt for an example (available from the problem statement). This parameter is optional.</li>
+</ul>
+All file and directory parameters can be relative or absolute paths. <br/><br/>
+Other optional parameters you may use:
+<ul>
+	<li>-w &lt;width&gt; : width of the tool's screen. Defaults to 1500.</li>
+	<li>-no-gui : if present then no GUI will be shown, the application just scores the supplied solution file in command line mode.</li>
+	<li>-iou-threshold : the IOU threshold to use during matching. Defaults to 0.45.</li>
+	<li>-large-uncertain : (used as a private hack in final testing) if present, an uncertain area is allowed to be matched with more than one solution buildings.</li>
+</ul>
+
+A sample command line that will display the data set used to make example submissions, and the supplied sample solution file:
+<pre>
+java -jar visualizer.jar -truth ./data/truth-example.txt -solution ./data/solution-example.txt -data-dir ./data
+</pre>
+This assumes that you have already downloaded the training data, and copied the required truth and solution files and the data files of the 4 example tiles in the ./data directory like this:
+<pre>
+/data
+  JAX_Tile_004_DSM.tif
+  JAX_Tile_004_GTI.tif
+  JAX_Tile_004_RGB.tif
+  ...
+  TAM_Tile_001_DSM.tif
+  ...
+  truth-example.txt
+  solution-example.txt
+</pre>
+ 
+<h3>Operations</h3>
+Image selection works by selecting an item from the image dropdown list or clicking on lines containing an image name in the output log window. You can zoom in/out within the image view by the mouse wheel, and pan the view by dragging. Switch between RGB and DSM modes using the RGB/DSM dropdown list or by right clicking the image. <br/>
+
+If you specify both a truth file and a solution file then solution and truth are compared automatically on startup, scores are displayed in the log window and also in the command line.<br/>
+
+True positive buildings are displayed in white, false positives are yellow, false negatives are blue. Uncertain truth buildings are diagonally striped. (Note that the colour of the uncertain buildings are the same as for certain ones (white or blue) but they are not considered when counting TP and FN values.)<br/>
+
+<h2>File converter tool</h2>
+
+You can use the same tool to convert between _GTI.tif files and their RLE-encoded textual versions as follows. Converting TIFF to TXT may be useful if you want to work only with a subset of the training data and want to create the corresponding RLE truth file for visualization. You probably won't need the reverse conversion (TXT to TIFF).<br></br>
+
+<b>TIFF to TXT</b><br/>
+
+<pre>
+java -jar visualizer.jar -tiff2txt &lt;data_path&gt; &lt;out_file&gt;
+</pre>
+
+where
+<ul>
+  <li>data_path points to a directory or a TIFF file. In case of a directory, it is recursively traversed to find all _GTI.tif files. In case of a file, only this TIFF file will be processed.</li>
+  <li>out_file points to the resulting TXT output file.</li>
+</ul>
+
+Note that the output of this tool has a similar but not identical format to the RLE format described in the problem specification. There are two differences: 
+<ul>
+	<li>uncertain buildings are represented by negative building labels,</li>
+	<li>the file may have an additional line per tile that describes the non-visible areas of the tile.</li>
+</ul>
+This format is used only internally by the visualizer.<br/><br/> 
+
+<b>TXT to TIFF</b><br/>
+
+<pre>
+java -jar visualizer.jar -txt2tiff &lt;input_file&gt; &lt;output_dir&gt;
+</pre>
+
+where
+<ul>
+  <li>input_file is an RLE-encoded text file,</li>
+  <li>output_dir points to a directory where the resulting TIFF files will be placed.</li>
+</ul>
+
+The tool does not support converting text files that have uncertain buildings (with negative building labels) or lines that represent non-visible areas, it is meant to convert only the RLE format described in the problem specification.
