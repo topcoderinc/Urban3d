@@ -29,7 +29,9 @@ NOTES:
 
 # Urban 3D Challenge Datasets 
 
-The complete datasets used for the Urban 3D Challenge can be found on the [SpaceNet AWS page](https://spacenetchallenge.github.io/datasets/Urban_3D_Challenge_summary.html). Please refer to documentation on that website for instructions on how to download the data. 
+The complete datasets used for the Urban 3D Challenge can be found on the [SpaceNet AWS page](https://spacenet.ai/the-ussocom-urban-3d-competition/). Please refer to documentation on that website for instructions on how to download the data. 
+
+**PLEASE NOTE: The data on AWS S3 has moved from s3://spacenet-dataset/Urban_3D_Challenge/ to s3://spacenet-dataset/Hosted-Datasets/Urban_3D_Challenge/. This change has not yet been reflected on the SpaceNet AWS Urban 3D Challenge page. We are working with SpaceNet to have this corrected.**
 
 # Algorithm Evaluation
 
